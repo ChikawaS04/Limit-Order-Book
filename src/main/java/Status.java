@@ -1,0 +1,3 @@
+public enum Status {
+    OPEN, PARTIALLY_FILLED, FILLED, CANCELLED
+}
