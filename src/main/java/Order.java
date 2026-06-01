@@ -10,13 +10,22 @@ public class Order {
     private long participantID;
 
     public Order(long orderID, long timeStamp, Side side, int quantity, long price, OrderType orderType, Status status, long participantID) {
+
+        if (quantity <= 0) { throw new IllegalArgumentException("Quantity must be positive"); }
+        if (orderID <= 0) { throw new IllegalArgumentException("Order ID must be positive"); }
+        if (participantID <= 0) { throw new IllegalArgumentException("Participant ID must be positive"); }
+        if (timeStamp <= 0) { throw new IllegalArgumentException("Timestamp must be positive"); }
+        if (side == null) { throw new IllegalArgumentException("Side cannot be null"); }
+        if (orderType == null) { throw new IllegalArgumentException("Order type cannot be null"); }
+        if (orderType == OrderType.LIMIT && price <= 0) { throw new IllegalArgumentException("Limit order price must be positive");}
+
         this.orderID = orderID;
         this.timeStamp = timeStamp;
         this.side = side;
         this.quantity = quantity;
-        this.price = price;
+        this.price = (orderType == OrderType.MARKET ? 0 : price);
         this.orderType = orderType;
-        this.status = status;
+        this.status = Status.OPEN;
         this.participantID = participantID;
     }
 
@@ -38,8 +47,8 @@ public class Order {
                 ", quantity=" + quantity +
                 ", price=" + price +
                 ", orderType='" + orderType + '\'' +
-                ", participantID=" + participantID +
                 ", status='" + status + '\'' +
+                ", participantID=" + participantID +
                 '}';
     }
 }
