@@ -5,28 +5,33 @@ public class Order {
     private Side side;
     private int quantity;
     private long price;
-    private OrderType orderType;
     private Status status;
     private long participantID;
 
-    public Order(long orderID, long timeStamp, Side side, int quantity, long price, OrderType orderType, Status status, long participantID) {
+    public Order(long orderID, long timeStamp, Side side, int quantity, long price, long participantID) {
 
-        if (quantity <= 0) { throw new IllegalArgumentException("Quantity must be positive"); }
         if (orderID <= 0) { throw new IllegalArgumentException("Order ID must be positive"); }
-        if (participantID <= 0) { throw new IllegalArgumentException("Participant ID must be positive"); }
         if (timeStamp <= 0) { throw new IllegalArgumentException("Timestamp must be positive"); }
+        if (participantID <= 0) { throw new IllegalArgumentException("Participant ID must be positive"); }
+        if (quantity <= 0) { throw new IllegalArgumentException("Quantity must be positive"); }
+        if (price <= 0) { throw new IllegalArgumentException("Price must be positive"); }
         if (side == null) { throw new IllegalArgumentException("Side cannot be null"); }
-        if (orderType == null) { throw new IllegalArgumentException("Order type cannot be null"); }
-        if (orderType == OrderType.LIMIT && price <= 0) { throw new IllegalArgumentException("Limit order price must be positive");}
 
         this.orderID = orderID;
         this.timeStamp = timeStamp;
         this.side = side;
         this.quantity = quantity;
-        this.price = (orderType == OrderType.MARKET ? 0 : price);
-        this.orderType = orderType;
+        this.price = price;
         this.status = Status.OPEN;
         this.participantID = participantID;
+    }
+
+    public void fill(int fillQty) {
+        if (fillQty <= 0) { throw new IllegalArgumentException("Fill quantity must be positive"); }
+        if (fillQty > this.quantity) { throw new IllegalArgumentException("Fill quantity exceeds remaining quantity"); }
+
+        this.quantity -= fillQty;
+        this.status = (this.quantity == 0) ? Status.FILLED : Status.PARTIALLY_FILLED;
     }
 
     public long getOrderID() { return orderID; }
@@ -34,7 +39,6 @@ public class Order {
     public Side getSide() { return side; }
     public int getQuantity() { return quantity; }
     public long getPrice() { return price; }
-    public OrderType getOrderType() { return orderType; }
     public Status getStatus() { return status; }
     public long getParticipantID() { return participantID; }
 
@@ -46,7 +50,6 @@ public class Order {
                 ", side='" + side + '\'' +
                 ", quantity=" + quantity +
                 ", price=" + price +
-                ", orderType='" + orderType + '\'' +
                 ", status='" + status + '\'' +
                 ", participantID=" + participantID +
                 '}';
