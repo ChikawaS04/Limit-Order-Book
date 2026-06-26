@@ -13,7 +13,5 @@ public class IDGenerator {
         return participantIDCounter.incrementAndGet ();
     }
 
-    public static long nextTradeID() {
-        return tradeIDCounter.incrementAndGet ();
-    }
+    public static long nextTradeID() { return tradeIDCounter.incrementAndGet (); }
 }

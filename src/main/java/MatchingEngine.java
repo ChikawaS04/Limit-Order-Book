@@ -104,6 +104,10 @@ public class MatchingEngine {
         }
     }
 
+    public List<Trade> getTrades() {
+        return trades;
+    }
+
     public void printBook() {
         System.out.println("Bids:");
         for (Map.Entry<Long, Deque<Order>> entry : bids.entrySet()) {
