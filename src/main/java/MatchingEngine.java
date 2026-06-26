@@ -1,9 +1,4 @@
-import java.util.Comparator;
-import java.util.Deque;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 
 public class MatchingEngine {
 
@@ -12,6 +7,8 @@ public class MatchingEngine {
     private final TreeMap<Long, Deque<Order>> asks = new TreeMap<>();
 
     private final List<Trade> trades = new ArrayList<>();
+
+    private final Map<Long, Order> openOrders = new HashMap<>();
 
     private void matchBuy(Order buyOrder) {
         while (buyOrder.getQuantity() > 0 && !asks.isEmpty()) {
@@ -66,6 +63,45 @@ public class MatchingEngine {
                     asks.pollFirstEntry();
                 }
             }
+        }
+    }
+
+    public void addOrder(Order order) {
+        if (order.getSide() == Side.BUY) {
+            matchBuy(order);
+            if (order.getQuantity() > 0) addToBook(bids, order);
+        } else {
+            matchSell(order);
+            if (order.getQuantity() > 0) addToBook(asks, order);
+        }
+    }
+
+    private void addToBook(TreeMap<Long, Deque<Order>> book, Order order) {
+        book.computeIfAbsent(order.getPrice(), k -> new ArrayDeque<>()).addLast(order);
+    }
+
+    public void cancelOrder(long orderID) {
+        Order order = openOrders.remove(orderID);
+        if (order == null || order.getQuantity() == 0) return;
+
+        order.cancel();
+
+        TreeMap<Long, Deque<Order>> book = (order.getSide() == Side.BUY) ? bids : asks;
+        Deque<Order> queue = book.get(order.getPrice());
+        if (queue != null) {
+            queue.remove(order);
+            if (queue.isEmpty()) book.remove(order.getPrice());
+        }
+    }
+
+    public void printBook() {
+        System.out.println("Bids:");
+        for (Map.Entry<Long, Deque<Order>> entry : bids.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+        System.out.println("Asks:");
+        for (Map.Entry<Long, Deque<Order>> entry : asks.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
         }
     }
 }

@@ -34,6 +34,10 @@ public class Order {
         this.status = (this.quantity == 0) ? Status.FILLED : Status.PARTIALLY_FILLED;
     }
 
+    public void cancel() {
+        this.status = Status.CANCELLED;
+    }
+
     public long getOrderID() { return orderID; }
     public long getTimeStamp() { return timeStamp; }
     public Side getSide() { return side; }
