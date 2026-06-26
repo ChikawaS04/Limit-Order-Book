@@ -2,12 +2,16 @@ import java.util.Comparator;
 import java.util.Deque;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.List;
+import java.util.ArrayList;
 
 public class MatchingEngine {
 
     private final TreeMap<Long, Deque<Order>> bids = new TreeMap<>(Comparator.reverseOrder());
 
     private final TreeMap<Long, Deque<Order>> asks = new TreeMap<>();
+
+    private final List<Trade> trades = new ArrayList<>();
 
     private void matchBuy(Order buyOrder) {
         while (buyOrder.getQuantity() > 0 && !asks.isEmpty()) {
@@ -22,6 +26,16 @@ public class MatchingEngine {
             int quantityMatched = Math.min(buyOrder.getQuantity(), askOrder.getQuantity());
             buyOrder.fill(quantityMatched);
             askOrder.fill(quantityMatched);
+            trades.add(new Trade(
+                    0L,
+                    buyOrder.getOrderID(),
+                    askOrder.getOrderID(),
+                    buyOrder.getParticipantID(),
+                    askOrder.getParticipantID(),
+                    askPrice,
+                    quantityMatched,
+                    System.nanoTime()
+            ));
 
             if (askOrder.getQuantity() == 0) {
                 bestAskQueue.removeFirst();
