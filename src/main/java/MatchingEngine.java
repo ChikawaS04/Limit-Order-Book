@@ -18,7 +18,7 @@ public class MatchingEngine {
             if (askPrice > buyOrder.getPrice()) break;
 
             Deque<Order> bestAskQueue = bestAskEntry.getValue();
-            Order askOrder = bestAskQueue.peek();
+            Order askOrder = bestAskQueue.getFirst();
 
             int quantityMatched = Math.min(buyOrder.getQuantity(), askOrder.getQuantity());
             buyOrder.fill(quantityMatched);
@@ -51,7 +51,7 @@ public class MatchingEngine {
             if (bidPrice < sellOrder.getPrice()) break;
 
             Deque<Order> bestBidQueue = bestBidEntry.getValue();
-            Order bidOrder = bestBidQueue.peek();
+            Order bidOrder = bestBidQueue.getFirst();
 
             int quantityMatched = Math.min(sellOrder.getQuantity(), bidOrder.getQuantity());
             sellOrder.fill(quantityMatched);
