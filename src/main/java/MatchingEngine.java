@@ -15,6 +15,43 @@ public class MatchingEngine {
             long askPrice = bestAskEntry.getKey();
 
             if (askPrice > buyOrder.getPrice()) break;
+
+            Deque<Order> bestAskQueue = bestAskEntry.getValue();
+            Order askOrder = bestAskQueue.peek();
+
+            int quantityMatched = Math.min(buyOrder.getQuantity(), askOrder.getQuantity());
+            buyOrder.fill(quantityMatched);
+            askOrder.fill(quantityMatched);
+
+            if (askOrder.getQuantity() == 0) {
+                bestAskQueue.removeFirst();
+                if (bestAskQueue.isEmpty()) {
+                    asks.pollFirstEntry();
+                }
+            }
+        }
+    }
+
+    private void matchSell(Order sellOrder) {
+        while (sellOrder.getQuantity() > 0 && !bids.isEmpty()) {
+            Map.Entry<Long, Deque<Order>> bestBidEntry = bids.firstEntry();
+            long bidPrice = bestBidEntry.getKey();
+
+            if (bidPrice > sellOrder.getPrice()) break;
+
+            Deque<Order> bestBidQueue = bestBidEntry.getValue();
+            Order askOrder = bestBidQueue.peek();
+
+            int quantityMatched = Math.min(sellOrder.getQuantity(), askOrder.getQuantity());
+            sellOrder.fill(quantityMatched);
+            askOrder.fill(quantityMatched);
+
+            if (askOrder.getQuantity() == 0) {
+                bestBidQueue.removeFirst();
+                if (bestBidQueue.isEmpty()) {
+                    asks.pollFirstEntry();
+                }
+            }
         }
     }
 }
