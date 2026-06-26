@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class MatchingEngine {
+public class MatchingEngine implements BookView {
 
     private final TreeMap<Long, Deque<Order>> bids = new TreeMap<>(Comparator.reverseOrder());
 
@@ -109,13 +109,46 @@ public class MatchingEngine {
     }
 
     public void printBook() {
-        System.out.println("Bids:");
+        System.out.println("=============== ORDER BOOK ===============");
+
+        // Asks: highest at top, lowest nearest to spread
+        for (Map.Entry<Long, Deque<Order>> entry : asks.descendingMap().entrySet()) {
+            int totalQty = entry.getValue().stream().mapToInt(Order::getQuantity).sum();
+            System.out.printf("  ASK  %10s   %6d%n", formatPrice(entry.getKey()), totalQty);
+        }
+
+        long bestBid = getBestBid();
+        long bestAsk = getBestAsk();
+        System.out.println("  ---------------------------------------");
+        if (bestBid != -1L && bestAsk != -1L) {
+            long spread = bestAsk - bestBid;
+            long midpoint = (bestBid + bestAsk) / 2;
+            System.out.printf("  Spread: %s     Mid: %s%n", formatPrice(spread), formatPrice(midpoint));
+        } else {
+            System.out.println("  No spread (one side empty)");
+        }
+        System.out.println("  ---------------------------------------");
+
+        // Bids: highest first (natural iteration of reverse-ordered TreeMap)
         for (Map.Entry<Long, Deque<Order>> entry : bids.entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
+            int totalQty = entry.getValue().stream().mapToInt(Order::getQuantity).sum();
+            System.out.printf("  BID  %10s   %6d%n", formatPrice(entry.getKey()), totalQty);
         }
-        System.out.println("Asks:");
-        for (Map.Entry<Long, Deque<Order>> entry : asks.entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
-        }
+
+        System.out.println("==========================================");
+    }
+
+    private String formatPrice(long priceInCents) {
+        return String.format("$%d.%02d", priceInCents / 100, priceInCents % 100);
+    }
+
+    @Override
+    public long getBestBid() {
+        return bids.firstKey();
+    }
+
+    @Override
+    public long getBestAsk() {
+        return asks.firstKey();
     }
 }
