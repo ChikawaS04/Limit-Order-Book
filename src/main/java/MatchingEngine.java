@@ -24,7 +24,7 @@ public class MatchingEngine {
             buyOrder.fill(quantityMatched);
             askOrder.fill(quantityMatched);
             trades.add(new Trade(
-                    0L,
+                    IDGenerator.nextTradeID(),
                     buyOrder.getOrderID(),
                     askOrder.getOrderID(),
                     buyOrder.getParticipantID(),
@@ -48,19 +48,29 @@ public class MatchingEngine {
             Map.Entry<Long, Deque<Order>> bestBidEntry = bids.firstEntry();
             long bidPrice = bestBidEntry.getKey();
 
-            if (bidPrice > sellOrder.getPrice()) break;
+            if (bidPrice < sellOrder.getPrice()) break;
 
             Deque<Order> bestBidQueue = bestBidEntry.getValue();
-            Order askOrder = bestBidQueue.peek();
+            Order bidOrder = bestBidQueue.peek();
 
-            int quantityMatched = Math.min(sellOrder.getQuantity(), askOrder.getQuantity());
+            int quantityMatched = Math.min(sellOrder.getQuantity(), bidOrder.getQuantity());
             sellOrder.fill(quantityMatched);
-            askOrder.fill(quantityMatched);
+            bidOrder.fill(quantityMatched);
+            trades.add(new Trade(
+                    IDGenerator.nextTradeID(),
+                    bidOrder.getOrderID(),
+                    sellOrder.getOrderID(),
+                    bidOrder.getParticipantID(),
+                    sellOrder.getParticipantID(),
+                    bidPrice,
+                    quantityMatched,
+                    System.nanoTime()
+            ));
 
-            if (askOrder.getQuantity() == 0) {
+            if (bidOrder.getQuantity() == 0) {
                 bestBidQueue.removeFirst();
                 if (bestBidQueue.isEmpty()) {
-                    asks.pollFirstEntry();
+                    bids.pollFirstEntry();
                 }
             }
         }
