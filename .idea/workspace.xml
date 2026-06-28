@@ -5,10 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e1aea6c6-22a5-4fbf-ab3b-b1fb46959b08" name="Changes" comment="Finished the main logic.">
-      <change afterPath="$PROJECT_DIR$/src/main/java/BookView.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/MarketDataService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/MatchingEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/MatchingEngine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/IDGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/util/IDGenerator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/MarketDataService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/market/MarketDataService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/MatchingEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/engine/MatchingEngine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/Order.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Side.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/Side.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Status.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/Status.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Trade.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/Trade.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,7 +21,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="17" />
+    <option name="cachedIndexableFilesCount" value="19" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -109,6 +114,9 @@
       <workItem from="1782406815751" duration="22549000" />
       <workItem from="1782453826649" duration="380000" />
       <workItem from="1782486804287" duration="3574000" />
+      <workItem from="1782508834750" duration="152000" />
+      <workItem from="1782577410648" duration="569000" />
+      <workItem from="1782605404185" duration="965000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit: Order Book Demo project">
       <option name="closed" value="true" />
@@ -198,7 +206,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782454187780</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Finished the main logic.">
+      <option name="closed" value="true" />
+      <created>1782508858630</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1782508858631</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

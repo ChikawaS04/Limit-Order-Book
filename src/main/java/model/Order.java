@@ -1,3 +1,5 @@
+package model;
+
 public class Order {
 
     private long orderID;
@@ -10,12 +12,12 @@ public class Order {
 
     public Order(long orderID, long timeStamp, Side side, int quantity, long price, long participantID) {
 
-        if (orderID <= 0) { throw new IllegalArgumentException("Order ID must be positive"); }
+        if (orderID <= 0) { throw new IllegalArgumentException("model.Order ID must be positive"); }
         if (timeStamp <= 0) { throw new IllegalArgumentException("Timestamp must be positive"); }
         if (participantID <= 0) { throw new IllegalArgumentException("Participant ID must be positive"); }
         if (quantity <= 0) { throw new IllegalArgumentException("Quantity must be positive"); }
         if (price <= 0) { throw new IllegalArgumentException("Price must be positive"); }
-        if (side == null) { throw new IllegalArgumentException("Side cannot be null"); }
+        if (side == null) { throw new IllegalArgumentException("model.Side cannot be null"); }
 
         this.orderID = orderID;
         this.timeStamp = timeStamp;
@@ -48,7 +50,7 @@ public class Order {
 
     @Override
     public String toString() {
-        return "Order{" +
+        return "model.Order{" +
                 "orderID=" + orderID +
                 ", timeStamp=" + timeStamp +
                 ", side='" + side + '\'' +

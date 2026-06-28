@@ -1,3 +1,5 @@
+package market;
+
 public class MarketDataService {
 
     private final BookView bookView;

@@ -1,3 +1,5 @@
+package util;
+
 import java.util.concurrent.atomic.AtomicLong;
 
 public class IDGenerator {

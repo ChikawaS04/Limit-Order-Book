@@ -1,3 +1,9 @@
+import engine.MatchingEngine;
+import model.Order;
+import model.Side;
+import model.Trade;
+import util.IDGenerator;
+
 public class Main {
     public static void main(String[] args) {
         MatchingEngine engine = new MatchingEngine();
@@ -47,8 +53,8 @@ public class Main {
         System.out.println("\n=== After Cancelling Bid @ 9800 ===");
         engine.printBook();
 
-        // Trade history
-        System.out.println("\n=== Trade History ===");
+        // model.Trade history
+        System.out.println("\n=== model.Trade History ===");
         for (Trade trade : engine.getTrades()) {
             System.out.println(trade);
         }

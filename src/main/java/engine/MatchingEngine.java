@@ -1,3 +1,9 @@
+package engine;
+
+import model.Order;
+import model.Side;
+import model.Trade;
+
 import java.util.*;
 
 public class MatchingEngine implements BookView {

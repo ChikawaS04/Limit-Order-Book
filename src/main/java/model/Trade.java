@@ -1,3 +1,5 @@
+package model;
+
 public record Trade(
         long tradeId,
         long buyOrderId,
