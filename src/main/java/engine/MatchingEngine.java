@@ -3,6 +3,7 @@ package engine;
 import model.Order;
 import model.Side;
 import model.Trade;
+import util.IDGenerator;
 
 import java.util.*;
 

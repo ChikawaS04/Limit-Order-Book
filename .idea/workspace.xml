@@ -4,16 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e1aea6c6-22a5-4fbf-ab3b-b1fb46959b08" name="Changes" comment="Finished the main logic.">
+    <list default="true" id="e1aea6c6-22a5-4fbf-ab3b-b1fb46959b08" name="Changes" comment="Did some file restructuring to organize classes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/IDGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/util/IDGenerator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/MarketDataService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/market/MarketDataService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/MatchingEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/engine/MatchingEngine.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/Order.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Side.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/Side.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Status.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/Status.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Trade.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/Trade.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/engine/MatchingEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/engine/MatchingEngine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/market/MarketDataService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/market/MarketDataService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,7 +16,6 @@
   </component>
   <component name="EmbeddingIndexingInfo">
     <option name="cachedIndexableFilesCount" value="19" />
-    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -116,7 +109,9 @@
       <workItem from="1782486804287" duration="3574000" />
       <workItem from="1782508834750" duration="152000" />
       <workItem from="1782577410648" duration="569000" />
-      <workItem from="1782605404185" duration="965000" />
+      <workItem from="1782605404185" duration="2282000" />
+      <workItem from="1782614441916" duration="17000" />
+      <workItem from="1783390949882" duration="49000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit: Order Book Demo project">
       <option name="closed" value="true" />
@@ -214,7 +209,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782508858631</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Did some file restructuring to organize classes">
+      <option name="closed" value="true" />
+      <created>1782606559949</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1782606559949</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -230,6 +233,7 @@
     <MESSAGE value="feat: implement order submission, cancellation, and book display&#10;&#10;- addOrder: routes to matchBuy/matchSell, rests unfilled quantity&#10;- addToBook: inserts order into price level queue via computeIfAbsent&#10;- cancelOrder: marks order cancelled and removes from book with O(n) lookup&#10;- printBook: displays current bid/ask book state" />
     <MESSAGE value="feat: add IdGenerator for order, trade, and participant IDs&#10;&#10;- Static utility class with AtomicLong counters&#10;- Replaces hardcoded 0L trade IDs in matchBuy/matchSell" />
     <MESSAGE value="Finished the main logic." />
-    <option name="LAST_COMMIT_MESSAGE" value="Finished the main logic." />
+    <MESSAGE value="Did some file restructuring to organize classes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Did some file restructuring to organize classes" />
   </component>
 </project>

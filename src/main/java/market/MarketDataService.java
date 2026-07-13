@@ -1,5 +1,7 @@
 package market;
 
+import engine.BookView;
+
 public class MarketDataService {
 
     private final BookView bookView;
