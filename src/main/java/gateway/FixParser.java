@@ -158,4 +158,28 @@ final class FixParser {
 
         return count;
     }
+
+    /**
+     * Verifies the FIX checksum (tag 10) for the message in buf[offset, offset+length).
+     *
+     * Relies on the frame decoder's trailer invariant: the message ends with the
+     * 7-byte field 10=xxx<SOH>. The checksum covers every byte from the start of the
+     * message up to and including the SOH preceding 10=, summed mod 256, compared
+     * against the 3-digit value of tag 10.
+     *
+     * @return true if the computed checksum matches tag 10; false on any reject.
+     */
+    static boolean validateChecksum(byte[] buf, int offset, int length) {
+        // Room for at least one summed byte plus the 7-byte trailer.
+        if (length < 8) { return false; }
+
+        int end = offset + length;
+        int trailerStart = end - 7;  // index of '1' in "10="
+
+        int sum = 0;
+        for (int i = offset; i < trailerStart; i++) { sum += buf[i] & 0xFF; }  // byte is signed; checksum is unsigned mod 256
+
+        long expected = parseLong(buf, end - 4, end - 1);  // the three "xxx" digits
+        return expected == (sum & 0xFF);
+    }
 }
