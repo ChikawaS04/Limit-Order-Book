@@ -35,4 +35,20 @@ public final class FixConstants {
     // Boundary-only, off the hot path.
     public static final String SYMBOL_DISPLAY = "ASML";
 
+    /**
+     * Parses the ASCII digits in {@code buf[start, end)} into a non-negative long.
+     * Returns -1L on any reject: empty range, non-digit byte, or overflow past
+     * Long.MAX_VALUE. All valid results are >= 0, so -1 is an unambiguous sentinel.
+     */
+    static long parseLong(byte[] buf, int start, int end) {
+        if (start >= end) { return -1L; }
+        long val = 0L;
+        for (int i = start; i < end; i++) {
+            int digit = buf[i] - '0';
+            if (digit < 0 || digit > 9) { return -1L; }
+            if (val > (Long.MAX_VALUE - digit) / 10) { return -1L; }
+            val = val * 10 + digit;
+        }
+        return val;
+    }
 }

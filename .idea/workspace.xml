@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e1aea6c6-22a5-4fbf-ab3b-b1fb46959b08" name="Changes" comment="Did some file restructuring to organize classes">
-      <change afterPath="$PROJECT_DIR$/src/main/java/gateway/FixConstants.java" afterDir="false" />
+    <list default="true" id="e1aea6c6-22a5-4fbf-ab3b-b1fb46959b08" name="Changes" comment="Implemented step 0 of the order gateway: added FixConstants holding SOH = 0x01, EQUALS = '='. tag numbers: 8, 9, 10, 35, 11, 38, 41, 44, 54, 55. msg-type bytes: 'D', 'F'. the single configured instrument symbol for the book">
+      <change afterPath="$PROJECT_DIR$/src/test/java/gateway/FixParserTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gateway/FixConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gateway/FixConstants.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -14,7 +16,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="19" />
+    <option name="cachedIndexableFilesCount" value="20" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -55,30 +57,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Application.DefaultConfig.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Application.DefaultConfig.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_directory_selection": "C:/Users/ddavi/IdeaProjects/LimitOrderBook/src/test/java",
+    "last_opened_file_path": "C:/Users/ddavi/IdeaProjects/LimitOrderBook",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="" />
@@ -114,7 +118,8 @@
       <workItem from="1783390949882" duration="49000" />
       <workItem from="1783982906644" duration="2652000" />
       <workItem from="1784690287793" duration="4000" />
-      <workItem from="1784764408615" duration="3014000" />
+      <workItem from="1784764408615" duration="3603000" />
+      <workItem from="1784772653192" duration="4011000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit: Order Book Demo project">
       <option name="closed" value="true" />
@@ -228,7 +233,15 @@
       <option name="project" value="LOCAL" />
       <updated>1783983100272</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Implemented step 0 of the order gateway: added FixConstants holding SOH = 0x01, EQUALS = '='. tag numbers: 8, 9, 10, 35, 11, 38, 41, 44, 54, 55. msg-type bytes: 'D', 'F'. the single configured instrument symbol for the book">
+      <option name="closed" value="true" />
+      <created>1784772099197</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1784772099197</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -245,6 +258,7 @@
     <MESSAGE value="feat: add IdGenerator for order, trade, and participant IDs&#10;&#10;- Static utility class with AtomicLong counters&#10;- Replaces hardcoded 0L trade IDs in matchBuy/matchSell" />
     <MESSAGE value="Finished the main logic." />
     <MESSAGE value="Did some file restructuring to organize classes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Did some file restructuring to organize classes" />
+    <MESSAGE value="Implemented step 0 of the order gateway: added FixConstants holding SOH = 0x01, EQUALS = '='. tag numbers: 8, 9, 10, 35, 11, 38, 41, 44, 54, 55. msg-type bytes: 'D', 'F'. the single configured instrument symbol for the book" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implemented step 0 of the order gateway: added FixConstants holding SOH = 0x01, EQUALS = '='. tag numbers: 8, 9, 10, 35, 11, 38, 41, 44, 54, 55. msg-type bytes: 'D', 'F'. the single configured instrument symbol for the book" />
   </component>
 </project>
