@@ -24,6 +24,10 @@ public final class FixConstants {
     public static final int SYMBOL = 55;
     public static final int ORIG_CL_ORD_ID = 41;  // cancels only
 
+    // --- Message-type values (the byte after 35=) ---
+    public static final byte MSG_TYPE_NEW_ORDER = 'D';  // NewOrderSingle
+    public static final byte MSG_TYPE_CANCEL    = 'F';  // OrderCancelRequest
+
     // --- Configured instrument ---
     // Single-symbol book. Stored as byte[] so tag 55 can be compared against a
     // buf[start..end) range without allocating a String on the parse path.

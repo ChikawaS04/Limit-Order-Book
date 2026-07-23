@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e1aea6c6-22a5-4fbf-ab3b-b1fb46959b08" name="Changes" comment="test(gateway): add FixParser tag scanner tests&#10;&#10;Cover the Step 3 scanner: session tags pass through in order,&#10;'='-in-value delimited by SOH, empty/non-numeric tag and missing '='&#10;rejects, empty value accepted (deferred to Step 5), MAX_FIELDS&#10;boundary both sides, and offset/length handling within a larger buffer.">
+    <list default="true" id="e1aea6c6-22a5-4fbf-ab3b-b1fb46959b08" name="Changes" comment="Add checksum validation for FIX messages (Step 4)&#10;&#10;Verify tag 10 before any message interpretation: sum every byte up to and&#10;including the SOH preceding &quot;10=&quot;, mod 256, and compare against the field's&#10;three-digit value. Operates on raw byte[] so structural trust is&#10;established before the tag scan, independent of the Step 3 scanner arrays.&#10;&#10;Locate the trailer by computing from the end (a complete message ends in&#10;the 7-byte 10=xxx&lt;SOH&gt;) rather than scanning for it, leaning on the frame&#10;decoder's trailer invariant instead of duplicating a scan. Read the three&#10;digits via parseLong, which gives free rejection of a malformed checksum&#10;field: its -1L sentinel can't equal a 0..255 sum, consistent with the&#10;parseLong/parsePrice reject convention.&#10;&#10;Guard length &lt; 8 (no room for a summed byte plus the trailer) before&#10;indexing. The per-byte &amp; 0xFF is kept for clarity but is not load-bearing:&#10;the final &amp; 0xFF already collapses the signed/unsigned difference, since a&#10;high byte differs by exactly 256, i.e. 0 mod 256.&#10;&#10;Static, pure byte[] in; no String, no io.netty, no com.lmax. Runs at the&#10;gateway boundary, off the hot path.&#10;&#10;Tested: known-good message (independently computed checksum), corrupted&#10;body byte, wrong checksum value, non-digit checksum field, too-short&#10;buffer, and the good message embedded in a wider buffer to verify&#10;offset/length bounds.">
+      <change afterPath="$PROJECT_DIR$/src/main/java/event/OrderEvent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/event/OrderEventType.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gateway/FixConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gateway/FixConstants.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/gateway/FixParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gateway/FixParser.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -14,7 +17,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="22" />
+    <option name="cachedIndexableFilesCount" value="25" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -60,6 +63,7 @@
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Application.DefaultConfig.executor": "Run",
     "JUnit.All in OrderBookDemo.executor": "Run",
+    "JUnit.FixParserChecksumTest.executor": "Run",
     "JUnit.FixParserPriceTest.executor": "Run",
     "JUnit.FixParserScanTest.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
@@ -72,7 +76,7 @@
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "last_directory_selection": "C:/Users/ddavi/IdeaProjects/LimitOrderBook/src/test/java",
-    "last_opened_file_path": "C:/Users/ddavi/IdeaProjects/LimitOrderBook",
+    "last_opened_file_path": "C:/Users/ddavi/IdeaProjects/Limit-Order-Management-System",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -182,7 +186,8 @@
       <workItem from="1784690287793" duration="4000" />
       <workItem from="1784764408615" duration="3603000" />
       <workItem from="1784772653192" duration="7088000" />
-      <workItem from="1784825409073" duration="7970000" />
+      <workItem from="1784825409073" duration="8423000" />
+      <workItem from="1784834279695" duration="3807000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit: Order Book Demo project">
       <option name="closed" value="true" />
@@ -336,7 +341,15 @@
       <option name="project" value="LOCAL" />
       <updated>1784831703286</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="Add checksum validation for FIX messages (Step 4)&#10;&#10;Verify tag 10 before any message interpretation: sum every byte up to and&#10;including the SOH preceding &quot;10=&quot;, mod 256, and compare against the field's&#10;three-digit value. Operates on raw byte[] so structural trust is&#10;established before the tag scan, independent of the Step 3 scanner arrays.&#10;&#10;Locate the trailer by computing from the end (a complete message ends in&#10;the 7-byte 10=xxx&lt;SOH&gt;) rather than scanning for it, leaning on the frame&#10;decoder's trailer invariant instead of duplicating a scan. Read the three&#10;digits via parseLong, which gives free rejection of a malformed checksum&#10;field: its -1L sentinel can't equal a 0..255 sum, consistent with the&#10;parseLong/parsePrice reject convention.&#10;&#10;Guard length &lt; 8 (no room for a summed byte plus the trailer) before&#10;indexing. The per-byte &amp; 0xFF is kept for clarity but is not load-bearing:&#10;the final &amp; 0xFF already collapses the signed/unsigned difference, since a&#10;high byte differs by exactly 256, i.e. 0 mod 256.&#10;&#10;Static, pure byte[] in; no String, no io.netty, no com.lmax. Runs at the&#10;gateway boundary, off the hot path.&#10;&#10;Tested: known-good message (independently computed checksum), corrupted&#10;body byte, wrong checksum value, non-digit checksum field, too-short&#10;buffer, and the good message embedded in a wider buffer to verify&#10;offset/length bounds.">
+      <option name="closed" value="true" />
+      <created>1784833912263</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1784833912263</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -358,6 +371,7 @@
     <MESSAGE value="Add parsePrice for FIX price fields (Step 2)&#10;&#10;Parse a byte-range FIX price to long cents, reusing parseLong for the&#10;integer and fractional parts. Scale the fraction by digit length, not&#10;value: one digit *10, two digits as-is.&#10;&#10;Reject (-1L sentinel, consistent with parseLong) on: empty range, empty&#10;integer part, more than two decimals, non-digit bytes, and non-positive&#10;result. The zero/negative price policy is applied here via the &gt; 0 check,&#10;since parseLong deliberately treats &quot;0&quot; as a valid parse.&#10;&#10;PRICE_SCALE and MAX_DECIMALS kept private to the parser (no second caller).&#10;No String/split/BigDecimal; pure byte[] in, off the hot path.&#10;&#10;Tested: integer-only, one/two decimals, leading zeros, zero-integer-part&#10;with positive fraction, and rejects for &gt;2 decimals, zero, negative, bare&#10;dot, empty integer part, trailing dot, trailing junk, and multiple dots.&#10;Tests embed each price in a wider buffer to verify offset/length bounds." />
     <MESSAGE value="Add zero-allocation FIX message scanner (Step 3)&#10;&#10;- Add MAX_FIELDS = 32 constant to FixConstants to bound scanner arrays&#10;- Add parallel arrays (tags, valStarts, valEnds) to FixParser for&#10;  allocation-free tokenisation; reuse across messages with no reset needed&#10;- Implement FixParser.scan(): tokenises a raw FIX byte buffer into&#10;  (tag, valueStart, valueEnd) triples; returns field count or -1 on&#10;  any structural reject (missing '=', unterminated value, non-digit tag,&#10;  field overflow)" />
     <MESSAGE value="test(gateway): add FixParser tag scanner tests&#10;&#10;Cover the Step 3 scanner: session tags pass through in order,&#10;'='-in-value delimited by SOH, empty/non-numeric tag and missing '='&#10;rejects, empty value accepted (deferred to Step 5), MAX_FIELDS&#10;boundary both sides, and offset/length handling within a larger buffer." />
-    <option name="LAST_COMMIT_MESSAGE" value="test(gateway): add FixParser tag scanner tests&#10;&#10;Cover the Step 3 scanner: session tags pass through in order,&#10;'='-in-value delimited by SOH, empty/non-numeric tag and missing '='&#10;rejects, empty value accepted (deferred to Step 5), MAX_FIELDS&#10;boundary both sides, and offset/length handling within a larger buffer." />
+    <MESSAGE value="Add checksum validation for FIX messages (Step 4)&#10;&#10;Verify tag 10 before any message interpretation: sum every byte up to and&#10;including the SOH preceding &quot;10=&quot;, mod 256, and compare against the field's&#10;three-digit value. Operates on raw byte[] so structural trust is&#10;established before the tag scan, independent of the Step 3 scanner arrays.&#10;&#10;Locate the trailer by computing from the end (a complete message ends in&#10;the 7-byte 10=xxx&lt;SOH&gt;) rather than scanning for it, leaning on the frame&#10;decoder's trailer invariant instead of duplicating a scan. Read the three&#10;digits via parseLong, which gives free rejection of a malformed checksum&#10;field: its -1L sentinel can't equal a 0..255 sum, consistent with the&#10;parseLong/parsePrice reject convention.&#10;&#10;Guard length &lt; 8 (no room for a summed byte plus the trailer) before&#10;indexing. The per-byte &amp; 0xFF is kept for clarity but is not load-bearing:&#10;the final &amp; 0xFF already collapses the signed/unsigned difference, since a&#10;high byte differs by exactly 256, i.e. 0 mod 256.&#10;&#10;Static, pure byte[] in; no String, no io.netty, no com.lmax. Runs at the&#10;gateway boundary, off the hot path.&#10;&#10;Tested: known-good message (independently computed checksum), corrupted&#10;body byte, wrong checksum value, non-digit checksum field, too-short&#10;buffer, and the good message embedded in a wider buffer to verify&#10;offset/length bounds." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add checksum validation for FIX messages (Step 4)&#10;&#10;Verify tag 10 before any message interpretation: sum every byte up to and&#10;including the SOH preceding &quot;10=&quot;, mod 256, and compare against the field's&#10;three-digit value. Operates on raw byte[] so structural trust is&#10;established before the tag scan, independent of the Step 3 scanner arrays.&#10;&#10;Locate the trailer by computing from the end (a complete message ends in&#10;the 7-byte 10=xxx&lt;SOH&gt;) rather than scanning for it, leaning on the frame&#10;decoder's trailer invariant instead of duplicating a scan. Read the three&#10;digits via parseLong, which gives free rejection of a malformed checksum&#10;field: its -1L sentinel can't equal a 0..255 sum, consistent with the&#10;parseLong/parsePrice reject convention.&#10;&#10;Guard length &lt; 8 (no room for a summed byte plus the trailer) before&#10;indexing. The per-byte &amp; 0xFF is kept for clarity but is not load-bearing:&#10;the final &amp; 0xFF already collapses the signed/unsigned difference, since a&#10;high byte differs by exactly 256, i.e. 0 mod 256.&#10;&#10;Static, pure byte[] in; no String, no io.netty, no com.lmax. Runs at the&#10;gateway boundary, off the hot path.&#10;&#10;Tested: known-good message (independently computed checksum), corrupted&#10;body byte, wrong checksum value, non-digit checksum field, too-short&#10;buffer, and the good message embedded in a wider buffer to verify&#10;offset/length bounds." />
   </component>
 </project>
