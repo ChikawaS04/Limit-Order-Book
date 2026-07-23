@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e1aea6c6-22a5-4fbf-ab3b-b1fb46959b08" name="Changes" comment="Implemented step 0 of the order gateway: added FixConstants holding SOH = 0x01, EQUALS = '='. tag numbers: 8, 9, 10, 35, 11, 38, 41, 44, 54, 55. msg-type bytes: 'D', 'F'. the single configured instrument symbol for the book">
-      <change afterPath="$PROJECT_DIR$/src/test/java/gateway/FixParserTest.java" afterDir="false" />
+    <list default="true" id="e1aea6c6-22a5-4fbf-ab3b-b1fb46959b08" name="Changes" comment="Implemented step 1 of the order gateway:parseLong(byte[] buf, int start, int end). Goal: pure byte-range to long. Foundation for every numeric parse downstream. Walk bytes [start, end). For each: digit = b - '0', reject if outside 0..9, accumulate val = val * 10 + digit.As well as some unit tests">
+      <change afterPath="$PROJECT_DIR$/src/test/java/gateway/FixParserPriceTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/gateway/FixConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gateway/FixConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gateway/FixParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gateway/FixParser.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,7 +16,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="20" />
+    <option name="cachedIndexableFilesCount" value="22" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -61,6 +61,8 @@
   "keyToString": {
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Application.DefaultConfig.executor": "Run",
+    "JUnit.All in OrderBookDemo.executor": "Run",
+    "JUnit.FixParserPriceTest.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -88,7 +90,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="JUnit.FixParserPriceTest">
     <configuration name="DefaultConfig" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="OrderBookDemo" />
@@ -96,6 +98,35 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="All in OrderBookDemo" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="OrderBookDemo" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="FixParserPriceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="OrderBookDemo" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="gateway.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="gateway" />
+      <option name="MAIN_CLASS_NAME" value="gateway.FixParserPriceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.FixParserPriceTest" />
+        <item itemvalue="JUnit.All in OrderBookDemo" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -119,7 +150,8 @@
       <workItem from="1783982906644" duration="2652000" />
       <workItem from="1784690287793" duration="4000" />
       <workItem from="1784764408615" duration="3603000" />
-      <workItem from="1784772653192" duration="4011000" />
+      <workItem from="1784772653192" duration="7088000" />
+      <workItem from="1784825409073" duration="3691000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit: Order Book Demo project">
       <option name="closed" value="true" />
@@ -241,7 +273,15 @@
       <option name="project" value="LOCAL" />
       <updated>1784772099197</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Implemented step 1 of the order gateway:parseLong(byte[] buf, int start, int end). Goal: pure byte-range to long. Foundation for every numeric parse downstream. Walk bytes [start, end). For each: digit = b - '0', reject if outside 0..9, accumulate val = val * 10 + digit.As well as some unit tests">
+      <option name="closed" value="true" />
+      <created>1784777368880</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1784777368880</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -259,6 +299,7 @@
     <MESSAGE value="Finished the main logic." />
     <MESSAGE value="Did some file restructuring to organize classes" />
     <MESSAGE value="Implemented step 0 of the order gateway: added FixConstants holding SOH = 0x01, EQUALS = '='. tag numbers: 8, 9, 10, 35, 11, 38, 41, 44, 54, 55. msg-type bytes: 'D', 'F'. the single configured instrument symbol for the book" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented step 0 of the order gateway: added FixConstants holding SOH = 0x01, EQUALS = '='. tag numbers: 8, 9, 10, 35, 11, 38, 41, 44, 54, 55. msg-type bytes: 'D', 'F'. the single configured instrument symbol for the book" />
+    <MESSAGE value="Implemented step 1 of the order gateway:parseLong(byte[] buf, int start, int end). Goal: pure byte-range to long. Foundation for every numeric parse downstream. Walk bytes [start, end). For each: digit = b - '0', reject if outside 0..9, accumulate val = val * 10 + digit.As well as some unit tests" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implemented step 1 of the order gateway:parseLong(byte[] buf, int start, int end). Goal: pure byte-range to long. Foundation for every numeric parse downstream. Walk bytes [start, end). For each: digit = b - '0', reject if outside 0..9, accumulate val = val * 10 + digit.As well as some unit tests" />
   </component>
 </project>
