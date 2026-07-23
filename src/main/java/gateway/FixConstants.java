@@ -35,6 +35,10 @@ public final class FixConstants {
     // Boundary-only, off the hot path.
     public static final String SYMBOL_DISPLAY = "ASML";
 
+    // Max fields per message. A 35=D with session tags is ~15;
+    // 32 is comfortable headroom and bounds the scanner's arrays.
+    public static final int MAX_FIELDS = 32;
+
     /**
      * Parses the ASCII digits in {@code buf[start, end)} into a non-negative long.
      * Returns -1L on any reject: empty range, non-digit byte, or overflow past

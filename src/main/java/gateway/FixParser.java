@@ -35,6 +35,13 @@ final class FixParser {
     private static final long PRICE_SCALE = 100;  // 2 decimal places -> cents
     private static final byte DOT = '.';
 
+    // Scanner output: parallel arrays, index-aligned, valid up to the
+    // count returned by scan(). No per-message allocation; no reset
+    // needed between messages since count bounds every read.
+    final int[] tags       = new int[FixConstants.MAX_FIELDS];
+    final int[] valStarts  = new int[FixConstants.MAX_FIELDS];
+    final int[] valEnds    = new int[FixConstants.MAX_FIELDS];
+
     /**
      * Parses a FIX price field (bytes [start, end)) to long cents.
      * "150" -> 15000, "150.2" -> 15020, "150.25" -> 15025.
@@ -92,5 +99,63 @@ final class FixParser {
         // Price policy: zero or negative rejects. parseLong lets "0" through
         // as a valid 0, so the field-level check lives here, not in parseLong.
         return cents > 0 ? cents : -1L;
+    }
+
+    /**
+     * Tokenises one complete FIX message into (tag, valueStart, valueEnd)
+     * triples stored in the parallel arrays. Pure structure — no checksum,
+     * no dispatch, no field-type judgment. Unknown tags pass through.
+     *
+     * @return number of fields scanned, or -1 on any structural reject.
+     */
+    int scan(byte[] buf, int offset, int length) {
+        final int end = offset + length;
+        int pos = offset;
+        int count = 0;
+
+        while (pos < end) {
+            // --- locate '=' ending the tag; SOH-before-'=' means no '=' ---
+            final int tagStart = pos;
+            int eq = pos;
+            while (eq < end && buf[eq] != FixConstants.EQUALS) {
+                if (buf[eq] == FixConstants.SOH) {
+                    return -1;                 // field has no '='
+                }
+                eq++;
+            }
+            if (eq == end) {
+                return -1;                     // ran off the end seeking '='
+            }
+
+            // --- locate SOH ending the value; '=' inside the value is legal ---
+            final int valStart = eq + 1;
+            int soh = valStart;
+            while (soh < end && buf[soh] != FixConstants.SOH) {
+                soh++;
+            }
+            if (soh == end) {
+                return -1;                     // value never terminated by SOH
+            }
+
+            // --- parse the tag; empty or non-numeric falls out as -1 ---
+            final long tag = parseLong(buf, tagStart, eq);
+            if (tag < 0) {
+                return -1;                     // empty tag or non-digit tag
+            }
+
+            // --- bound the storage before writing ---
+            if (count == FixConstants.MAX_FIELDS) {
+                return -1;                     // too many fields
+            }
+
+            tags[count]      = (int) tag;
+            valStarts[count] = valStart;
+            valEnds[count]   = soh;
+            count++;
+
+            pos = soh + 1;                     // step past SOH to next field
+        }
+
+        return count;
     }
 }
