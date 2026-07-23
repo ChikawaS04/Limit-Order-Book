@@ -4,12 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e1aea6c6-22a5-4fbf-ab3b-b1fb46959b08" name="Changes" comment="Add checksum validation for FIX messages (Step 4)&#10;&#10;Verify tag 10 before any message interpretation: sum every byte up to and&#10;including the SOH preceding &quot;10=&quot;, mod 256, and compare against the field's&#10;three-digit value. Operates on raw byte[] so structural trust is&#10;established before the tag scan, independent of the Step 3 scanner arrays.&#10;&#10;Locate the trailer by computing from the end (a complete message ends in&#10;the 7-byte 10=xxx&lt;SOH&gt;) rather than scanning for it, leaning on the frame&#10;decoder's trailer invariant instead of duplicating a scan. Read the three&#10;digits via parseLong, which gives free rejection of a malformed checksum&#10;field: its -1L sentinel can't equal a 0..255 sum, consistent with the&#10;parseLong/parsePrice reject convention.&#10;&#10;Guard length &lt; 8 (no room for a summed byte plus the trailer) before&#10;indexing. The per-byte &amp; 0xFF is kept for clarity but is not load-bearing:&#10;the final &amp; 0xFF already collapses the signed/unsigned difference, since a&#10;high byte differs by exactly 256, i.e. 0 mod 256.&#10;&#10;Static, pure byte[] in; no String, no io.netty, no com.lmax. Runs at the&#10;gateway boundary, off the hot path.&#10;&#10;Tested: known-good message (independently computed checksum), corrupted&#10;body byte, wrong checksum value, non-digit checksum field, too-short&#10;buffer, and the good message embedded in a wider buffer to verify&#10;offset/length bounds.">
-      <change afterPath="$PROJECT_DIR$/src/main/java/event/OrderEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/event/OrderEventType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/gateway/FixConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gateway/FixConstants.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/gateway/FixParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gateway/FixParser.java" afterDir="false" />
+    <list default="true" id="e1aea6c6-22a5-4fbf-ab3b-b1fb46959b08" name="Changes" comment="feat(gateway): implement FixParser.parse for 35=D and 35=F (Step 5)&#10;&#10;Assemble the full message-level parser on top of the Step 1-4 primitives.&#10;parse() runs checksum -&gt; scan -&gt; dispatch on 35= -&gt; per-type validation,&#10;populating a pre-allocated OrderEvent slot only on success.&#10;&#10;- Add OrderEvent carrier and OrderEventType enum in event package&#10;  (framework-free: no com.lmax/io.netty, so both parser and Disruptor&#10;  can depend on it)&#10;- Add MSG_TYPE_NEW_ORDER ('D') / MSG_TYPE_CANCEL ('F') to FixConstants&#10;- Dispatch to parseNewOrder (requires 11,54,44,38,55) and parseCancel&#10;  (requires 11,41) via thin switch on tag 35&#10;- Validate into locals first; target is untouched on reject so the&#10;  gateway only publishes valid messages&#10;- Clear message-type-specific fields per branch to avoid stale reads&#10;  on the reused slot&#10;- eventType set in parser; timestamp deferred to gateway (Step 7) to&#10;  keep parse deterministic and unit-testable&#10;- Add findTag, symbolMatches, mapSide helpers (zero-allocation)&#10;- Reject rules: non-numeric ClOrdID, invalid side (54=3), wrong symbol,&#10;  qty &lt;= 0 (38=0), bad price (0/negative/&gt;2dp), unknown 35= type">
+      <change beforePath="$PROJECT_DIR$/src/test/java/gateway/FixParserTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/gateway/FixParserTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,6 +62,7 @@
     "JUnit.FixParserChecksumTest.executor": "Run",
     "JUnit.FixParserPriceTest.executor": "Run",
     "JUnit.FixParserScanTest.executor": "Run",
+    "JUnit.FixParserTest.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -93,7 +90,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.FixParserChecksumTest">
+  <component name="RunManager" selected="JUnit.FixParserTest">
     <configuration name="DefaultConfig" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="OrderBookDemo" />
@@ -154,8 +151,24 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="FixParserTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="OrderBookDemo" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="gateway.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="gateway" />
+      <option name="MAIN_CLASS_NAME" value="gateway.FixParserTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.FixParserTest" />
         <item itemvalue="JUnit.FixParserChecksumTest" />
         <item itemvalue="JUnit.FixParserScanTest" />
         <item itemvalue="JUnit.FixParserPriceTest" />
@@ -187,7 +200,7 @@
       <workItem from="1784764408615" duration="3603000" />
       <workItem from="1784772653192" duration="7088000" />
       <workItem from="1784825409073" duration="8423000" />
-      <workItem from="1784834279695" duration="3807000" />
+      <workItem from="1784834279695" duration="4129000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit: Order Book Demo project">
       <option name="closed" value="true" />
@@ -349,7 +362,15 @@
       <option name="project" value="LOCAL" />
       <updated>1784833912263</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="feat(gateway): implement FixParser.parse for 35=D and 35=F (Step 5)&#10;&#10;Assemble the full message-level parser on top of the Step 1-4 primitives.&#10;parse() runs checksum -&gt; scan -&gt; dispatch on 35= -&gt; per-type validation,&#10;populating a pre-allocated OrderEvent slot only on success.&#10;&#10;- Add OrderEvent carrier and OrderEventType enum in event package&#10;  (framework-free: no com.lmax/io.netty, so both parser and Disruptor&#10;  can depend on it)&#10;- Add MSG_TYPE_NEW_ORDER ('D') / MSG_TYPE_CANCEL ('F') to FixConstants&#10;- Dispatch to parseNewOrder (requires 11,54,44,38,55) and parseCancel&#10;  (requires 11,41) via thin switch on tag 35&#10;- Validate into locals first; target is untouched on reject so the&#10;  gateway only publishes valid messages&#10;- Clear message-type-specific fields per branch to avoid stale reads&#10;  on the reused slot&#10;- eventType set in parser; timestamp deferred to gateway (Step 7) to&#10;  keep parse deterministic and unit-testable&#10;- Add findTag, symbolMatches, mapSide helpers (zero-allocation)&#10;- Reject rules: non-numeric ClOrdID, invalid side (54=3), wrong symbol,&#10;  qty &lt;= 0 (38=0), bad price (0/negative/&gt;2dp), unknown 35= type">
+      <option name="closed" value="true" />
+      <created>1784838579922</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1784838579922</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -372,6 +393,7 @@
     <MESSAGE value="Add zero-allocation FIX message scanner (Step 3)&#10;&#10;- Add MAX_FIELDS = 32 constant to FixConstants to bound scanner arrays&#10;- Add parallel arrays (tags, valStarts, valEnds) to FixParser for&#10;  allocation-free tokenisation; reuse across messages with no reset needed&#10;- Implement FixParser.scan(): tokenises a raw FIX byte buffer into&#10;  (tag, valueStart, valueEnd) triples; returns field count or -1 on&#10;  any structural reject (missing '=', unterminated value, non-digit tag,&#10;  field overflow)" />
     <MESSAGE value="test(gateway): add FixParser tag scanner tests&#10;&#10;Cover the Step 3 scanner: session tags pass through in order,&#10;'='-in-value delimited by SOH, empty/non-numeric tag and missing '='&#10;rejects, empty value accepted (deferred to Step 5), MAX_FIELDS&#10;boundary both sides, and offset/length handling within a larger buffer." />
     <MESSAGE value="Add checksum validation for FIX messages (Step 4)&#10;&#10;Verify tag 10 before any message interpretation: sum every byte up to and&#10;including the SOH preceding &quot;10=&quot;, mod 256, and compare against the field's&#10;three-digit value. Operates on raw byte[] so structural trust is&#10;established before the tag scan, independent of the Step 3 scanner arrays.&#10;&#10;Locate the trailer by computing from the end (a complete message ends in&#10;the 7-byte 10=xxx&lt;SOH&gt;) rather than scanning for it, leaning on the frame&#10;decoder's trailer invariant instead of duplicating a scan. Read the three&#10;digits via parseLong, which gives free rejection of a malformed checksum&#10;field: its -1L sentinel can't equal a 0..255 sum, consistent with the&#10;parseLong/parsePrice reject convention.&#10;&#10;Guard length &lt; 8 (no room for a summed byte plus the trailer) before&#10;indexing. The per-byte &amp; 0xFF is kept for clarity but is not load-bearing:&#10;the final &amp; 0xFF already collapses the signed/unsigned difference, since a&#10;high byte differs by exactly 256, i.e. 0 mod 256.&#10;&#10;Static, pure byte[] in; no String, no io.netty, no com.lmax. Runs at the&#10;gateway boundary, off the hot path.&#10;&#10;Tested: known-good message (independently computed checksum), corrupted&#10;body byte, wrong checksum value, non-digit checksum field, too-short&#10;buffer, and the good message embedded in a wider buffer to verify&#10;offset/length bounds." />
-    <option name="LAST_COMMIT_MESSAGE" value="Add checksum validation for FIX messages (Step 4)&#10;&#10;Verify tag 10 before any message interpretation: sum every byte up to and&#10;including the SOH preceding &quot;10=&quot;, mod 256, and compare against the field's&#10;three-digit value. Operates on raw byte[] so structural trust is&#10;established before the tag scan, independent of the Step 3 scanner arrays.&#10;&#10;Locate the trailer by computing from the end (a complete message ends in&#10;the 7-byte 10=xxx&lt;SOH&gt;) rather than scanning for it, leaning on the frame&#10;decoder's trailer invariant instead of duplicating a scan. Read the three&#10;digits via parseLong, which gives free rejection of a malformed checksum&#10;field: its -1L sentinel can't equal a 0..255 sum, consistent with the&#10;parseLong/parsePrice reject convention.&#10;&#10;Guard length &lt; 8 (no room for a summed byte plus the trailer) before&#10;indexing. The per-byte &amp; 0xFF is kept for clarity but is not load-bearing:&#10;the final &amp; 0xFF already collapses the signed/unsigned difference, since a&#10;high byte differs by exactly 256, i.e. 0 mod 256.&#10;&#10;Static, pure byte[] in; no String, no io.netty, no com.lmax. Runs at the&#10;gateway boundary, off the hot path.&#10;&#10;Tested: known-good message (independently computed checksum), corrupted&#10;body byte, wrong checksum value, non-digit checksum field, too-short&#10;buffer, and the good message embedded in a wider buffer to verify&#10;offset/length bounds." />
+    <MESSAGE value="feat(gateway): implement FixParser.parse for 35=D and 35=F (Step 5)&#10;&#10;Assemble the full message-level parser on top of the Step 1-4 primitives.&#10;parse() runs checksum -&gt; scan -&gt; dispatch on 35= -&gt; per-type validation,&#10;populating a pre-allocated OrderEvent slot only on success.&#10;&#10;- Add OrderEvent carrier and OrderEventType enum in event package&#10;  (framework-free: no com.lmax/io.netty, so both parser and Disruptor&#10;  can depend on it)&#10;- Add MSG_TYPE_NEW_ORDER ('D') / MSG_TYPE_CANCEL ('F') to FixConstants&#10;- Dispatch to parseNewOrder (requires 11,54,44,38,55) and parseCancel&#10;  (requires 11,41) via thin switch on tag 35&#10;- Validate into locals first; target is untouched on reject so the&#10;  gateway only publishes valid messages&#10;- Clear message-type-specific fields per branch to avoid stale reads&#10;  on the reused slot&#10;- eventType set in parser; timestamp deferred to gateway (Step 7) to&#10;  keep parse deterministic and unit-testable&#10;- Add findTag, symbolMatches, mapSide helpers (zero-allocation)&#10;- Reject rules: non-numeric ClOrdID, invalid side (54=3), wrong symbol,&#10;  qty &lt;= 0 (38=0), bad price (0/negative/&gt;2dp), unknown 35= type" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(gateway): implement FixParser.parse for 35=D and 35=F (Step 5)&#10;&#10;Assemble the full message-level parser on top of the Step 1-4 primitives.&#10;parse() runs checksum -&gt; scan -&gt; dispatch on 35= -&gt; per-type validation,&#10;populating a pre-allocated OrderEvent slot only on success.&#10;&#10;- Add OrderEvent carrier and OrderEventType enum in event package&#10;  (framework-free: no com.lmax/io.netty, so both parser and Disruptor&#10;  can depend on it)&#10;- Add MSG_TYPE_NEW_ORDER ('D') / MSG_TYPE_CANCEL ('F') to FixConstants&#10;- Dispatch to parseNewOrder (requires 11,54,44,38,55) and parseCancel&#10;  (requires 11,41) via thin switch on tag 35&#10;- Validate into locals first; target is untouched on reject so the&#10;  gateway only publishes valid messages&#10;- Clear message-type-specific fields per branch to avoid stale reads&#10;  on the reused slot&#10;- eventType set in parser; timestamp deferred to gateway (Step 7) to&#10;  keep parse deterministic and unit-testable&#10;- Add findTag, symbolMatches, mapSide helpers (zero-allocation)&#10;- Reject rules: non-numeric ClOrdID, invalid side (54=3), wrong symbol,&#10;  qty &lt;= 0 (38=0), bad price (0/negative/&gt;2dp), unknown 35= type" />
   </component>
 </project>
