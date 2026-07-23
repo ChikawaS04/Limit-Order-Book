@@ -5,8 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e1aea6c6-22a5-4fbf-ab3b-b1fb46959b08" name="Changes" comment="Did some file restructuring to organize classes">
+      <change afterPath="$PROJECT_DIR$/src/main/java/gateway/FixConstants.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/market/MarketDataService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/market/MarketDataService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,7 +38,7 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/ChikawaS04/Order-Book-Practice.git&quot;,
+    &quot;url&quot;: &quot;https://github.com/ChikawaS04/Limit-Order-Book.git&quot;,
     &quot;accountId&quot;: &quot;b151aab0-7571-469b-8d7d-74b014b47f4e&quot;
   }
 }</component>
@@ -112,7 +112,9 @@
       <workItem from="1782605404185" duration="2282000" />
       <workItem from="1782614441916" duration="17000" />
       <workItem from="1783390949882" duration="49000" />
-      <workItem from="1783982906644" duration="1315000" />
+      <workItem from="1783982906644" duration="2652000" />
+      <workItem from="1784690287793" duration="4000" />
+      <workItem from="1784764408615" duration="3014000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit: Order Book Demo project">
       <option name="closed" value="true" />
